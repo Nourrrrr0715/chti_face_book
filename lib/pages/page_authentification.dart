@@ -52,9 +52,9 @@ class _PageAuthentificationState extends State<PageAuthentification> {
         MaterialPageRoute(builder: (context) => const PageNavigation()),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur : $result")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Erreur : $result")));
     }
   }
 
@@ -68,9 +68,9 @@ class _PageAuthentificationState extends State<PageAuthentification> {
           child: Column(
             children: [
               const SizedBox(height: 20),
-              Image.asset(
-                'assets/flutter_logo.png',
-                height: 80,
+              Image.network(
+                'https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630',
+                height: 200,
               ),
               const SizedBox(height: 20),
 
