@@ -1,12 +1,13 @@
+import 'package:chti_face_bouc/modeles/membre.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import '../services_firebase/service_firestore.dart';
-import '../services_firebase/service_storage.dart';
 
 class PageEcrirePost extends StatefulWidget {
-  const PageEcrirePost({super.key});
+  final Membre member;
+  const PageEcrirePost({super.key, required this.member});
 
   @override
   State<PageEcrirePost> createState() => _PageEcrirePostState();
@@ -14,32 +15,51 @@ class PageEcrirePost extends StatefulWidget {
 
 class _PageEcrirePostState extends State<PageEcrirePost> {
   final TextEditingController textController = TextEditingController();
-  File? selectedImage;
+  XFile? selectedImage;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    textController.dispose();
+    super.dispose();
+  }
 
   Future<void> takePic(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: source, imageQuality: 50);
-
-    if (pickedFile != null) {
+    final XFile? image = await ImagePicker().pickImage(
+      source: source,
+      maxWidth: 800,
+    );
+    if (image != null) {
       setState(() {
-        selectedImage = File(pickedFile.path);
+        selectedImage = XFile(image.path);
       });
     }
   }
 
-  Future<void> _sendPost() async {
+  void envoyerPost() async {
     final texte = textController.text.trim();
-    if (texte.isEmpty || selectedImage == null) return;
+    FocusScope.of(context).requestFocus(FocusNode());
 
-    // 1. Upload image
-    final imageUrl = await ServiceStorage().uploadImage(selectedImage!);
+    if (texte.isEmpty && selectedImage == null) return;
 
-    // 2. Envoyer dans Firestore
-    await ServiceFirestore().createPost(texte: texte, imageUrl: imageUrl);
+    try {
+      await ServiceFirestore().createPost(
+        member: widget.member,
+        text: texte,
+        image: selectedImage,
+      );
 
-    // 3. Retour à l’accueil
-    if (!mounted) return;
-    Navigator.pop(context);
+      textController.clear();
+      setState(() {
+        selectedImage = null;
+      });
+    } catch (e) {
+      debugPrint('Error creating post: $e');
+    }
   }
 
   @override
@@ -67,16 +87,24 @@ class _PageEcrirePostState extends State<PageEcrirePost> {
                     TextField(
                       controller: textController,
                       maxLines: null,
-                      decoration: const InputDecoration(hintText: "Exprime-toi !"),
+                      decoration: const InputDecoration(
+                        hintText: "Exprime-toi !",
+                        border: InputBorder.none,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     if (selectedImage != null)
-                      Image.file(selectedImage!, height: 150),
+                      Image.file(
+                        File(selectedImage!.path),
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    const SizedBox(height: 12),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.photo),
+                          icon: const Icon(Icons.photo_library),
                           onPressed: () => takePic(ImageSource.gallery),
                         ),
                         IconButton(
@@ -85,14 +113,16 @@ class _PageEcrirePostState extends State<PageEcrirePost> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () async {
+                        envoyerPost();
+                      },
+                      child: const Text("Envoyer"),
+                    ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _sendPost,
-              child: const Text("Envoyer"),
             ),
           ],
         ),

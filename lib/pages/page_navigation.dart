@@ -41,7 +41,7 @@ class _PageNavigationState extends State<PageNavigation> {
               List<Widget> bodies = [
                 PageAccueil(),
                 PageMembres(),
-                PageEcrirePost(),
+                PageEcrirePost(member: member),
                 PageNotif(),
                 PageProfil(membre: member),
               ];

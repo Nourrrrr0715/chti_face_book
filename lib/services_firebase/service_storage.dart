@@ -1,15 +1,25 @@
 import 'dart:io';
+
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:uuid/uuid.dart' as uuid;
 
 class ServiceStorage {
-  final storageRef = FirebaseStorage.instance.ref();
+  static final instance = FirebaseStorage.instance;
+  Reference get ref => instance.ref();
 
-  Future<String> uploadImage(File file) async {
-    final fileName = const uuid.Uuid().v4();
-    final ref = storageRef.child("images/$fileName.jpg");
-    await ref.putFile(file);
-    return await ref.getDownloadURL();
+  Future<String> addImage({
+    required File file,
+    required String folder,
+    required String userId,
+    required String imageName,
+  }) async {
+    final reference = FirebaseStorage.instance
+        .ref()
+        .child(folder)
+        .child(userId)
+        .child(imageName);
+
+    UploadTask task = reference.putFile(file);
+    TaskSnapshot snapshot = await task;
+    return await snapshot.ref.getDownloadURL();
   }
-
 }

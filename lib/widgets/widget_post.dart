@@ -1,35 +1,69 @@
+import 'package:chti_face_bouc/modeles/post.dart';
+import 'package:chti_face_bouc/pages/page_detail_post.dart';
+import 'package:chti_face_bouc/services_firebase/service_firestore.dart';
 import 'package:flutter/material.dart';
 
-class PostWidget extends StatelessWidget {
-  final Map<String, dynamic> data;
-
-  const PostWidget({super.key, required this.data});
+class WidgetPost extends StatelessWidget {
+  final Post post;
+  const WidgetPost({super.key, required this.post});
 
   @override
   Widget build(BuildContext context) {
-    final texte = data['texte'] ?? '';
-    final image = data['image'] ?? '';
-    final auteur = "${data['prenom'] ?? ''} ${data['nom'] ?? ''}";
-    final nbLikes = data['likes'] ?? 0;
-
     return Card(
-      margin: const EdgeInsets.all(10),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
+      elevation: 10,
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(auteur, style: const TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            if (texte != '') Text(texte),
-            if (image != '')
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Image.network(image),
-              ),
-            const SizedBox(height: 10),
-            Text("👍 $nbLikes", style: const TextStyle(color: Colors.grey)),
+            Text(post.text),
+            // WidgetContenuPost(post: post),
+            const Divider(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    // ServiceFirestore().addLike(
+                    //   memberID: FirebaseAuth.instance.currentUser!.uid,
+                    //   post: post,
+                    // );
+                  },
+                  icon: Icon(
+                    Icons.star,
+                    color:
+                        // post.likes.contains(ServiceAuthentification().myId!)
+                        // ?
+                        // Colors.amber,
+                        // :
+                        Theme.of(context).colorScheme.secondary,
+                  ),
+                ),
+                Text('${post.likes.length} Likes'),
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PageDetailPost(post: post),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.messenger),
+                ),
+                // FutureBuilder<dynamic>(
+                //   future: ServiceFirestore().postComment(post.id),
+                //   builder: (context, snapshot) {
+                //     if (snapshot.connectionState == ConnectionState.waiting) {
+                //       return const Text("...");
+                //     } else if (snapshot.hasError) {
+                //       return const Text("Erreur");
+                //     } else {
+                //       return Text('${snapshot.data} Commentaires');
+                //     }
+                //   },
+                // ),
+              ],
+            ),
           ],
         ),
       ),

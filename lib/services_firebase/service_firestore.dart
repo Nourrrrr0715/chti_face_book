@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:chti_face_bouc/modeles/membre.dart';
+import 'package:chti_face_bouc/services_firebase/service_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:image_picker/image_picker.dart';
 import '../modeles/constantes.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class ServiceFirestore {
   final _db = FirebaseFirestore.instance;
@@ -20,10 +24,10 @@ class ServiceFirestore {
   //       .update(membre.toMap());
   // }
 
-  Stream<QuerySnapshot> allPosts() {
+  allPosts() {
     return _db
         .collection('posts')
-        .orderBy('date', descending: true)
+        .orderBy(dateKey, descending: true)
         .snapshots();
   }
 
@@ -35,26 +39,31 @@ class ServiceFirestore {
         .snapshots();
   }
 
-  Future<void> createPost({
-    required String texte,
-    required String imageUrl,
+  createPost({
+    required Membre member,
+    required String text,
+    required XFile? image,
   }) async {
-    await FirebaseFirestore.instance.collection('posts').add({
-      'texte': texte,
-      'imageUrl': imageUrl,
-      'date': Timestamp.now(),
-      'likes': 0,
-      'auteur': FirebaseAuth.instance.currentUser!.uid,
-    });
-  }
+    final date = DateTime.now().millisecondsSinceEpoch;
 
-  Future<void> addPost(String content, {String? imageUrl}) {
-    final posts = FirebaseFirestore.instance.collection('posts');
-    return posts.add({
-      'content': content,
-      'imageUrl': imageUrl,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    Map<String, dynamic> map = {
+      memberIdKey: member.id,
+      likesKey: [],
+      dateKey: date,
+      textKey: text,
+    };
+
+    if (image != null) {
+      final url = await ServiceStorage().addImage(
+        file: File(image.path),
+        folder: postCollectionKey,
+        userId: member.id,
+        imageName: date.toString(),
+      );
+      map[postImageKey] = url;
+    }
+
+    await _db.collection('posts').doc().set(map);
   }
 
   postComment(String postId) {
