@@ -16,18 +16,16 @@ class _PageDetailPostState extends State<PageDetailPost> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Détail du post'),
-      ),
+      appBar: AppBar(title: Text('Détail du post')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.post.image != null && widget.post.image!.isNotEmpty)
+            if (widget.post.image.isNotEmpty)
               ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(widget.post.image!),
+                child: Image.network(widget.post.image),
               ),
             const SizedBox(height: 16),
             Text(
@@ -37,15 +35,12 @@ class _PageDetailPostState extends State<PageDetailPost> {
             const SizedBox(height: 8),
             Text(
               widget.post.text,
-              style: Theme.of(context).textTheme.bodyMedium
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Commentaires',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
+            const SizedBox(height: 24),
+            Text('Commentaires', style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 12),
-            ListeCommentaire(commentaires: widget.post),
+            ListeCommentaire(post: widget.post),
           ],
         ),
       ),

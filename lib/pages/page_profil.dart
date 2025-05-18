@@ -20,7 +20,11 @@ class PageProfil extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text("Mon profil")),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance.collection('membres').doc(uid).snapshots(),
+        stream:
+            FirebaseFirestore.instance
+                .collection('membres')
+                .doc(uid)
+                .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return const Center(child: Text("Profil introuvable"));
@@ -39,10 +43,17 @@ class PageProfil extends StatelessWidget {
                 CircleAvatar(
                   radius: 40,
                   backgroundImage: photo != '' ? NetworkImage(photo) : null,
-                  child: photo == '' ? const Icon(Icons.person, size: 40) : null,
+                  child:
+                      photo == '' ? const Icon(Icons.person, size: 40) : null,
                 ),
                 const SizedBox(height: 10),
-                Text("$prenom $nom", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(
+                  "$prenom $nom",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 6),
                 Text(description, style: const TextStyle(color: Colors.grey)),
                 const SizedBox(height: 20),
@@ -53,7 +64,10 @@ class PageProfil extends StatelessWidget {
                   padding: EdgeInsets.all(8.0),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text("Mes publications", style: TextStyle(fontSize: 18)),
+                    child: Text(
+                      "Mes publications",
+                      style: TextStyle(fontSize: 18),
+                    ),
                   ),
                 ),
                 StreamBuilder(
@@ -62,13 +76,14 @@ class PageProfil extends StatelessWidget {
                     if (!snapshot.hasData) {
                       return const CircularProgressIndicator();
                     }
-                    final docs = (snapshot.data! as QuerySnapshot).docs;
+                    final docs = (snapshot.data!).docs;
                     return ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: docs.length,
                       itemBuilder: (context, index) {
-                        final postData = docs[index].data() as Map<String, dynamic>;
+                        final postData =
+                            docs[index].data() as Map<String, dynamic>;
                         return PostWidget(data: postData);
                       },
                     );

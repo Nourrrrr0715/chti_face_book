@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
-import '../modeles/membre.dart';
 
 class Avatar extends StatelessWidget {
-  final Membre membre;
-  final double radius;
+  final String? url;
+  final int radius;
 
-  const Avatar({Key? key, required this.membre, this.radius = 24}) : super(key: key);
+  const Avatar({super.key, this.url = '', required this.radius});
 
   @override
   Widget build(BuildContext context) {
+    if (url == null || url!.isEmpty) {
+      return CircleAvatar(
+        radius: radius.toDouble(),
+        backgroundColor: Theme.of(context).colorScheme.tertiary,
+        child: FlutterLogo(size: radius.toDouble()),
+      );
+    }
+
     return CircleAvatar(
-      radius: radius,
-      backgroundImage: membre.avatarUrl != null && membre.avatarUrl!.isNotEmpty
-          ? NetworkImage(membre.avatarUrl!)
-          : null,
-      child: (membre.avatarUrl == null || membre.avatarUrl!.isEmpty)
-          ? Text(membre.nom[0].toUpperCase())
-          : null,
+      radius: radius.toDouble(),
+      backgroundImage: NetworkImage(url!),
+      backgroundColor: Theme.of(context).colorScheme.tertiary,
     );
   }
 }

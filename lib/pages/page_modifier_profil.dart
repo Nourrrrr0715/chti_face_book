@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../modeles/membre.dart';
-import '../services_firebase/service_firestore.dart';
 
 /// Page permettant de modifier le profil d'un membre.
 class PageModifierProfil extends StatefulWidget {
@@ -21,8 +20,8 @@ class _PageModifierProfilState extends State<PageModifierProfil> {
   @override
   void initState() {
     super.initState();
-    _nomController = TextEditingController(text: widget.membre.nom);
-    _bioController = TextEditingController(text: widget.membre.bio ?? '');
+    _nomController = TextEditingController(text: widget.membre.name);
+    _bioController = TextEditingController(text: widget.membre.description);
   }
 
   @override
@@ -36,20 +35,20 @@ class _PageModifierProfilState extends State<PageModifierProfil> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    final updatedMembre = widget.membre.copyWith(
-      nom: _nomController.text.trim(),
-      bio: _bioController.text.trim(),
-    );
+    // final updatedMembre = widget.membre.copyWith(
+    //   nom: _nomController.text.trim(),
+    //   bio: _bioController.text.trim(),
+    // );
 
-    try {
-      await ServiceFirestore().updateMembre(updatedMembre);
-      Navigator.pop(context, updatedMembre);
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Erreur: \$e')));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+    // try {
+    //   await ServiceFirestore().updateMembre(updatedMembre);
+    //   Navigator.pop(context, updatedMembre);
+    // } catch (e) {
+    //   ScaffoldMessenger.of(context)
+    //       .showSnackBar(SnackBar(content: Text('Erreur: \$e')));
+    // } finally {
+    //   if (mounted) setState(() => _isLoading = false);
+    // }
   }
 
   @override
@@ -64,36 +63,40 @@ class _PageModifierProfilState extends State<PageModifierProfil> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _nomController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nom',
-                        border: OutlineInputBorder(),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _nomController,
+                        decoration: const InputDecoration(
+                          labelText: 'Nom',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator:
+                            (value) =>
+                                value == null || value.isEmpty
+                                    ? 'Entrez un nom'
+                                    : null,
                       ),
-                      validator: (value) =>
-                          value == null || value.isEmpty ? 'Entrez un nom' : null,
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _bioController,
-                      decoration: const InputDecoration(
-                        labelText: 'Bio',
-                        border: OutlineInputBorder(),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _bioController,
+                        decoration: const InputDecoration(
+                          labelText: 'Bio',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 3,
                       ),
-                      maxLines: 3,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
     );
   }
 }

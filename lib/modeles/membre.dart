@@ -1,34 +1,17 @@
+import 'package:chti_face_bouc/modeles/constantes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Membre {
-  final String id;
-  final String nom;
-  final String prenom;
-  final String mail;
-  final String photo;
+  DocumentReference reference;
+  String id;
+  Map<String, dynamic> map;
 
-  Membre({
-    required this.id,
-    required this.nom,
-    required this.prenom,
-    required this.mail,
-    required this.photo,
-  });
+  Membre({required this.reference, required this.id, required this.map});
 
-  Map<String, dynamic> toMap() {
-    return {
-      'nom': nom,
-      'prenom': prenom,
-      'mail': mail,
-      'photo': photo,
-    };
-  }
-
-  static Membre fromMap(String id, Map<String, dynamic> map) {
-    return Membre(
-      id: id,
-      nom: map['nom'],
-      prenom: map['prenom'],
-      mail: map['mail'],
-      photo: map['photo'],
-    );
-  }
+  String get name => map[nameKey] ?? "";
+  String get surname => map[surnameKey] ?? "";
+  String get profilePicture => map[profilePictureKey] ?? "";
+  String get coverPicture => map[coverPictureKey] ?? "";
+  String get description => map[descriptionKey] ?? "";
+  String get fullname => "$surname $name";
 }

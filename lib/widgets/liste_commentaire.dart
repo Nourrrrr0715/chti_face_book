@@ -1,5 +1,6 @@
 import 'package:chti_face_bouc/modeles/constantes.dart';
 import 'package:chti_face_bouc/services_firebase/service_firestore.dart';
+import 'package:chti_face_bouc/widgets/avatar.dart';
 import 'package:chti_face_bouc/widgets/formatage_date.dart';
 import 'package:chti_face_bouc/widgets/widget_vide.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -46,12 +47,12 @@ class ListeCommentaire extends StatelessWidget {
                   );
                 }
                 final member = snapshotUser.data!;
-                // final profileUrl = member[profilePictureKey];
+                final profileUrl = member[profilePictureKey];
                 final dateFormatted = FormatageDate().formatted(
                   document[dateKey],
                 );
                 return ListTile(
-                  // leading: Avatar(radius: 20, url: profileUrl),
+                  leading: Avatar(url: profileUrl, radius: 20),
                   title: Text(document[textKey]),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
