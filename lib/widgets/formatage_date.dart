@@ -1,14 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class FormatageDate extends StatelessWidget {
-  final DateTime date;
+class FormatageDate {
+  String formatted(int timestamps) {
+    DateTime postTime = DateTime.fromMillisecondsSinceEpoch(timestamps);
+    DateTime now = DateTime.now();
+    DateFormat format;
 
-  const FormatageDate({Key? key, required this.date}) : super(key: key);
+    if (now.difference(postTime).inDays > 0) {
+      format = DateFormat.yMMMd();
+    } else {
+      format = DateFormat.Hm();
+    }
 
-  @override
-  Widget build(BuildContext context) {
-    final df = DateFormat('dd MMM yyyy HH:mm', Localizations.localeOf(context).toString());
-    return Text(df.format(date), style: Theme.of(context).textTheme.caption);
+    return format.format(postTime).toString();
   }
 }
