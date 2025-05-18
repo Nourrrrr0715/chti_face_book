@@ -1,61 +1,47 @@
+import 'package:chti_face_bouc/modeles/membre.dart';
+import 'package:chti_face_bouc/widgets/avatar.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../services_firebase/service_firestore.dart';
-import '../widgets/widget_post.dart';
 
-class PageProfil extends StatelessWidget {
-  const PageProfil({super.key});
+class PageProfil extends StatefulWidget {
+  final Membre membre;
+  const PageProfil({super.key, required this.membre});
 
   @override
+  State<PageProfil> createState() => _PageProfilState();
+}
+
+class _PageProfilState extends State<PageProfil> {
+  @override
   Widget build(BuildContext context) {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    final firestore = ServiceFirestore();
-
-    if (uid == null) {
-      return const Center(child: Text("Utilisateur non connecté"));
-    }
-
     return Scaffold(
       appBar: AppBar(title: const Text("Mon profil")),
       body: StreamBuilder<DocumentSnapshot>(
-        stream:
-            FirebaseFirestore.instance
-                .collection('membres')
-                .doc(uid)
-                .snapshots(),
+        stream: ServiceFirestore().specificMember(widget.membre.id),
         builder: (context, snapshot) {
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return const Center(child: Text("Profil introuvable"));
           }
 
-          final data = snapshot.data!.data() as Map<String, dynamic>;
-          final prenom = data['prenom'] ?? '';
-          final nom = data['nom'] ?? '';
-          final description = data['description'] ?? '';
-          final photo = data['photo'] ?? '';
-
           return SingleChildScrollView(
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: photo != '' ? NetworkImage(photo) : null,
-                  child:
-                      photo == '' ? const Icon(Icons.person, size: 40) : null,
-                ),
+                Avatar(radius: 40, url: widget.membre.profilePicture),
                 const SizedBox(height: 10),
                 Text(
-                  "$prenom $nom",
+                  widget.membre.name + " " + widget.membre.surname,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(description, style: const TextStyle(color: Colors.grey)),
+                Text(
+                  widget.membre.description,
+                  style: const TextStyle(color: Colors.grey),
+                ),
                 const SizedBox(height: 20),
                 const Divider(),
 
@@ -70,25 +56,25 @@ class PageProfil extends StatelessWidget {
                     ),
                   ),
                 ),
-                StreamBuilder(
-                  stream: firestore.postForMember(uid),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const CircularProgressIndicator();
-                    }
-                    final docs = (snapshot.data!).docs;
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: docs.length,
-                      itemBuilder: (context, index) {
-                        final postData =
-                            docs[index].data() as Map<String, dynamic>;
-                        return PostWidget(data: postData);
-                      },
-                    );
-                  },
-                ),
+                // StreamBuilder(
+                //   stream: firestore.postForMember(uid),
+                //   builder: (context, snapshot) {
+                //     if (!snapshot.hasData) {
+                //       return const CircularProgressIndicator();
+                //     }
+                //     final docs = (snapshot.data!).docs;
+                //     return ListView.builder(
+                //       shrinkWrap: true,
+                //       physics: const NeverScrollableScrollPhysics(),
+                //       itemCount: docs.length,
+                //       itemBuilder: (context, index) {
+                //         final postData =
+                //             docs[index].data() as Map<String, dynamic>;
+                //         return PostWidget(data: postData);
+                //       },
+                //     );
+                //   },
+                // ),
               ],
             ),
           );

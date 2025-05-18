@@ -5,12 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 class ServiceFirestore {
   final _db = FirebaseFirestore.instance;
 
-  // Future<void> addMember(Membre membre) async {
-  //   await _db
-  //       .collection(ConstCollection.membres)
-  //       .doc(membre.id)
-  //       .set(membre.toMap());
-  // }
+  addMember({required String id, required Map<String, dynamic> data}) {
+    _db.collection('members').doc(id).set(data);
+  }
 
   specificMember(String memberId) {
     return _db.collection('members').doc(memberId).snapshots();
